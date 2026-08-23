@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI/ML Weekly Planner</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6ff;
+            color: #222;
+        }
+
+        header {
+            background: linear-gradient(135deg, #5b5bd6, #8b5cf6);
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        header h1 {
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 15px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+
+        .tracks {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .track {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            box-shadow: 0 3px 10px #00000012;
+        }
+
+        .track:hover,
+        .track.active {
+            border-color: #625ee8;
+            transform: translateY(-2px);
+        }
+
+        .track h3 {
+            margin-bottom: 8px;
+            color: #5555cc;
+        }
+
+        .progress-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 10px #00000012;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #ddd;
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        #progress {
+            height: 100%;
+            width: 0%;
+            background: #625ee8;
+            transition: 0.3s;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px #00000012;
+        }
+
+        th {
+            background: #625ee8;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr.completed {
+            background: #eaf8ef;
+        }
+
+        button {
+            border: none;
+            background: #625ee8;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #4947b8;
+        }
+
+        .project {
+            margin-top: 25px;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px #00000012;
+        }
+
+        .project h2 {
+            color: #5555cc;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #777;
+        }
+
+        @media (max-width: 800px) {
+            .tracks {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            table {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .tracks {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                width: 95%;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>🤖 AI/ML Weekly Learning Planner</h1>
+        <p>Learn → Practice → Build → Become AI Ready</p>
+    </header>
+
+    <div class="container">
+
+        <!-- Learning Tracks -->
+        <div class="tracks">
+
+            <div class="track active" onclick="changeTrack('AI & ML', this)">
+                <h3>🤖 AI & ML</h3>
+                <p>Machine Learning Basics</p>
+            </div>
+
+            <div class="track" onclick="changeTrack('Deep Learning', this)">
+                <h3>🧠 Deep Learning</h3>
+                <p>Neural Networks</p>
+            </div>
+
+            <div class="track" onclick="changeTrack('Generative AI', this)">
+                <h3>✨ Generative AI</h3>
+                <p>LLM & RAG</p>
+            </div>
+
+            <div class="track" onclick="changeTrack('Agentic AI', this)">
+                <h3>⚡ Agentic AI</h3>
+                <p>AI Agents</p>
+            </div>
+
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-box">
+            <h2 id="trackTitle">🤖 AI & ML</h2>
+            <p>Weekly Progress: <b id="percentage">0%</b></p>
+
+            <div class="progress-bar">
+                <div id="progress"></div>
+            </div>
+        </div>
+
+        <!-- Weekly Planner -->
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Topic</th>
+                    <th>What to Learn</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody id="planner"></tbody>
+
+        </table>
+
+        <!-- Project -->
+        <div class="project">
+            <h2>🚀 Weekly Project</h2>
+
+            <h3 id="projectTitle">
+                Student Performance Prediction
+            </h3>
+
+            <p id="projectDescription">
+                Build a machine learning model that predicts student
+                performance using Python and ML algorithms.
+            </p>
+        </div>
+
+    </div>
+
+    <footer>
+        AI Learning Planner © 2026
+    </footer>
+
+
+    <script>
+
+        const plans = {
+
+            "AI & ML": [
+                ["Monday", "Python & NumPy", "Learn Python, NumPy and Pandas", "1.5 hr"],
+                ["Tuesday", "Data Preprocessing", "Cleaning, encoding and scaling", "1.5 hr"],
+                ["Wednesday", "Regression", "Linear and Logistic Regression", "2 hr"],
+                ["Thursday", "Classification", "Decision Tree and KNN", "2 hr"],
+                ["Friday", "Clustering", "K-Means clustering", "1.5 hr"],
+                ["Saturday", "Mini Project", "Build a prediction model", "3 hr"],
+                ["Sunday", "Revision", "Review everything learned", "1 hr"]
+            ],
+
+            "Deep Learning": [
+                ["Monday", "Neural Networks", "Perceptron and activation functions", "2 hr"],
+                ["Tuesday", "Backpropagation", "Loss and gradient descent", "2 hr"],
+                ["Wednesday", "CNN", "Convolution and image processing", "2 hr"],
+                ["Thursday", "PyTorch", "Build neural networks using PyTorch", "2 hr"],
+                ["Friday", "Transfer Learning", "Use pretrained models", "2 hr"],
+                ["Saturday", "Image Project", "Build an image classifier", "3 hr"],
+                ["Sunday", "Revision", "Review neural networks", "1 hr"]
+            ],
+
+            "Generative AI": [
+                ["Monday", "LLM Basics", "Tokens, embeddings and transformers", "1.5 hr"],
+                ["Tuesday", "Prompt Engineering", "Zero-shot and few-shot prompting", "1.5 hr"],
+                ["Wednesday", "Embeddings", "Understand vector embeddings", "2 hr"],
+                ["Thursday", "RAG", "Retrieval Augmented Generation", "2 hr"],
+                ["Friday", "LLM APIs", "Work with AI APIs", "2 hr"],
+                ["Saturday", "AI Chatbot", "Build a simple AI chatbot", "3 hr"],
+                ["Sunday", "Revision", "Improve prompts and results", "1 hr"]
+            ],
+
+            "Agentic AI": [
+                ["Monday", "AI Agents", "Understand AI agent architecture", "1.5 hr"],
+                ["Tuesday", "Tool Calling", "Connect AI with external tools", "2 hr"],
+                ["Wednesday", "Planning", "Agent planning and reasoning", "2 hr"],
+                ["Thursday", "Memory", "Short and long-term memory", "1.5 hr"],
+                ["Friday", "Workflows", "Build AI workflows", "2 hr"],
+                ["Saturday", "Agent Project", "Build a research agent", "3 hr"],
+                ["Sunday", "Revision", "Test and improve your agent", "1 hr"]
+            ]
+        };
+
+
+        let currentPlan = plans["AI & ML"];
+        let completed = [];
+
+
+        function loadPlanner() {
+
+            const planner = document.getElementById("planner");
+
+            planner.innerHTML = "";
+
+            currentPlan.forEach((item, index) => {
+
+                const row = document.createElement("tr");
+
+                if (completed.includes(index)) {
+                    row.classList.add("completed");
+                }
+
+                row.innerHTML = `
+            <td><b>${item[0]}</b></td>
+            <td>${item[1]}</td>
+            <td>${item[2]}</td>
+            <td>${item[3]}</td>
+
+            <td>
+                <button onclick="completeTask(${index})">
+                    ${completed.includes(index) ? "✓ Done" : "Mark Done"}
+                </button>
+            </td>
+        `;
+
+                planner.appendChild(row);
+            });
+
+            updateProgress();
+        }
+
+
+        function completeTask(index) {
+
+            if (completed.includes(index)) {
+
+                completed = completed.filter(i => i !== index);
+
+            } else {
+
+                completed.push(index);
+
+            }
+
+            loadPlanner();
+        }
+
+
+        function updateProgress() {
+
+            let percent =
+                Math.round((completed.length / currentPlan.length) * 100);
+
+            document.getElementById("progress").style.width =
+                percent + "%";
+
+            document.getElementById("percentage").innerText =
+                percent + "%";
+        }
+
+
+        function changeTrack(trackName, element) {
+
+            document.querySelectorAll(".track")
+                .forEach(card => card.classList.remove("active"));
+
+            element.classList.add("active");
+
+            document.getElementById("trackTitle").innerText =
+                trackName;
+
+            currentPlan = plans[trackName];
+
+            completed = [];
+
+            updateProject(trackName);
+
+            loadPlanner();
+        }
+
+
+        function updateProject(track) {
+
+            const title =
+                document.getElementById("projectTitle");
+
+            const description =
+                document.getElementById("projectDescription");
+
+
+            if (track === "AI & ML") {
+
+                title.innerText =
+                    "Student Performance Prediction";
+
+                description.innerText =
+                    "Build a machine learning model to predict student performance.";
+
+            }
+
+            else if (track === "Deep Learning") {
+
+                title.innerText =
+                    "Image Classification System";
+
+                description.innerText =
+                    "Build a deep learning model that classifies images.";
+
+            }
+
+            else if (track === "Generative AI") {
+
+                title.innerText =
+                    "AI Study Assistant";
+
+                description.innerText =
+                    "Build a GenAI chatbot that answers questions from study material.";
+
+            }
+
+            else {
+
+                title.innerText =
+                    "AI Research Agent";
+
+                description.innerText =
+                    "Build an AI agent that searches, analyzes and summarizes information.";
+
+            }
+        }
+
+
+        loadPlanner();
+
+    </script>
+
+</body>
+
+</html>
