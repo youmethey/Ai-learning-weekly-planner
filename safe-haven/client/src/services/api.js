@@ -240,7 +240,10 @@ export async function fetchLocations(params = {}) {
   return safeFetch(
     `${API_BASE}/locations?${query.toString()}`,
     {},
-    () => localDB.getLocations(params)
+    () => {
+      const list = localDB.getLocations(params);
+      return { success: true, count: list.length, data: list };
+    }
   );
 }
 
@@ -248,7 +251,7 @@ export async function fetchLocationById(id) {
   return safeFetch(
     `${API_BASE}/locations/${id}`,
     {},
-    () => localDB.getLocationById(id)
+    () => ({ success: true, data: localDB.getLocationById(id) })
   );
 }
 
@@ -260,7 +263,7 @@ export async function submitLocationReview(id, review) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(review)
     },
-    () => localDB.addReview(id, review)
+    () => ({ success: true, data: localDB.addReview(id, review) })
   );
 }
 
@@ -268,7 +271,7 @@ export async function fetchHangouts() {
   return safeFetch(
     `${API_BASE}/hangouts`,
     {},
-    () => localDB.getHangouts()
+    () => ({ success: true, data: localDB.getHangouts() })
   );
 }
 
@@ -280,7 +283,7 @@ export async function createHangout(hangout) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(hangout)
     },
-    () => localDB.createHangout(hangout)
+    () => ({ success: true, data: localDB.createHangout(hangout) })
   );
 }
 
@@ -292,7 +295,7 @@ export async function updateHangout(id, updates) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates)
     },
-    () => localDB.updateHangout(id, updates)
+    () => ({ success: true, data: localDB.updateHangout(id, updates) })
   );
 }
 
@@ -300,7 +303,7 @@ export async function checkInHangout(id) {
   return safeFetch(
     `${API_BASE}/hangouts/${id}/checkin`,
     { method: 'POST' },
-    () => localDB.updateHangout(id, { lastCheckIn: new Date().toISOString() })
+    () => ({ success: true, data: localDB.updateHangout(id, { lastCheckIn: new Date().toISOString() }) })
   );
 }
 
@@ -316,7 +319,7 @@ export async function fetchContacts() {
   return safeFetch(
     `${API_BASE}/contacts`,
     {},
-    () => localDB.getContacts()
+    () => ({ success: true, data: localDB.getContacts() })
   );
 }
 
@@ -328,7 +331,7 @@ export async function createContact(contact) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(contact)
     },
-    () => localDB.createContact(contact)
+    () => ({ success: true, data: localDB.createContact(contact) })
   );
 }
 
@@ -340,7 +343,7 @@ export async function updateContact(id, updates) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates)
     },
-    () => localDB.updateContact(id, updates)
+    () => ({ success: true, data: localDB.updateContact(id, updates) })
   );
 }
 
@@ -356,7 +359,7 @@ export async function fetchProfile() {
   return safeFetch(
     `${API_BASE}/profile`,
     {},
-    () => localDB.getProfile()
+    () => ({ success: true, data: localDB.getProfile() })
   );
 }
 
@@ -368,7 +371,7 @@ export async function updateProfile(updates) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates)
     },
-    () => localDB.updateProfile(updates)
+    () => ({ success: true, data: localDB.updateProfile(updates) })
   );
 }
 

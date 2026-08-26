@@ -54,18 +54,38 @@ export default function App() {
       const unpack = (res) => (res && res.data !== undefined ? res.data : res);
 
       const locList = unpack(locRes);
-      if (Array.isArray(locList)) setLocations(locList);
+      if (Array.isArray(locList) && locList.length > 0) {
+        setLocations(locList);
+      } else {
+        setLocations(seedLocations);
+      }
 
       const hangList = unpack(hangRes);
-      if (Array.isArray(hangList)) setHangouts(hangList);
+      if (Array.isArray(hangList) && hangList.length > 0) {
+        setHangouts(hangList);
+      } else {
+        setHangouts(seedHangouts);
+      }
 
       const conList = unpack(conRes);
-      if (Array.isArray(conList)) setContacts(conList);
+      if (Array.isArray(conList) && conList.length > 0) {
+        setContacts(conList);
+      } else {
+        setContacts(seedContacts);
+      }
 
       const profData = unpack(profRes);
-      if (profData) setProfile(profData);
+      if (profData && typeof profData === 'object') {
+        setProfile(profData);
+      } else {
+        setProfile(seedProfile);
+      }
     } catch (err) {
       console.warn('Initial data load error:', err);
+      setLocations(seedLocations);
+      setHangouts(seedHangouts);
+      setContacts(seedContacts);
+      setProfile(seedProfile);
     } finally {
       setIsLoading(false);
     }
