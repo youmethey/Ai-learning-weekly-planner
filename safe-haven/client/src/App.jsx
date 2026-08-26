@@ -14,17 +14,18 @@ import ReportSafetyModal from './components/ReportSafetyModal';
 import Toast from './components/Toast';
 
 import { fetchLocations, fetchHangouts, fetchContacts, fetchProfile } from './services/api';
+import { seedLocations, seedHangouts, seedContacts, seedProfile } from './data/seedData';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('explore');
   const [perspective, setPerspective] = useState('women'); // 'women', 'men', 'all'
 
-  // Data states
-  const [locations, setLocations] = useState([]);
-  const [hangouts, setHangouts] = useState([]);
-  const [contacts, setContacts] = useState([]);
-  const [profile, setProfile] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // Data states (instantly initialized with seed data so places never appear empty)
+  const [locations, setLocations] = useState(seedLocations);
+  const [hangouts, setHangouts] = useState(seedHangouts);
+  const [contacts, setContacts] = useState(seedContacts);
+  const [profile, setProfile] = useState(seedProfile);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Modals & Active Trip State
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -49,10 +50,20 @@ export default function App() {
         fetchContacts(),
         fetchProfile()
       ]);
-      if (locRes.data) setLocations(locRes.data);
-      if (hangRes.data) setHangouts(hangRes.data);
-      if (conRes.data) setContacts(conRes.data);
-      if (profRes.data) setProfile(profRes.data);
+      
+      const unpack = (res) => (res && res.data !== undefined ? res.data : res);
+
+      const locList = unpack(locRes);
+      if (Array.isArray(locList)) setLocations(locList);
+
+      const hangList = unpack(hangRes);
+      if (Array.isArray(hangList)) setHangouts(hangList);
+
+      const conList = unpack(conRes);
+      if (Array.isArray(conList)) setContacts(conList);
+
+      const profData = unpack(profRes);
+      if (profData) setProfile(profData);
     } catch (err) {
       console.warn('Initial data load error:', err);
     } finally {

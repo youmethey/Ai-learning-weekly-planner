@@ -43,9 +43,9 @@ export default function HomePage({
     'Entertainment & Cinema'
   ];
 
-  // Filter locations
+  // Filter & Sort locations by highest safety score
   const filteredLocations = useMemo(() => {
-    return locations.filter(loc => {
+    const list = locations.filter(loc => {
       const matchQuery = 
         loc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         loc.neighborhood.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -55,16 +55,31 @@ export default function HomePage({
       const matchCategory = selectedCategory === 'All' || loc.category.toLowerCase().includes(selectedCategory.toLowerCase());
 
       const score = perspective === 'women' 
-        ? loc.genderSafety.womenScore 
+        ? (loc.genderSafety?.womenScore || loc.safetyScore) 
         : perspective === 'men' 
-          ? loc.genderSafety.menScore 
+          ? (loc.genderSafety?.menScore || loc.safetyScore) 
           : loc.safetyScore;
 
       const matchScore = score >= minSafetyScore;
 
       return matchQuery && matchCategory && matchScore;
     });
+
+    return list.sort((a, b) => {
+      const scoreA = perspective === 'women' ? (a.genderSafety?.womenScore || a.safetyScore) : perspective === 'men' ? (a.genderSafety?.menScore || a.safetyScore) : a.safetyScore;
+      const scoreB = perspective === 'women' ? (b.genderSafety?.womenScore || b.safetyScore) : perspective === 'men' ? (b.genderSafety?.menScore || b.safetyScore) : b.safetyScore;
+      return scoreB - scoreA;
+    });
   }, [locations, searchQuery, selectedCategory, minSafetyScore, perspective]);
+
+  // Top 3 Recommended Places Spotlight
+  const topRecommendedPlaces = useMemo(() => {
+    return [...locations].sort((a, b) => {
+      const scoreA = perspective === 'women' ? (a.genderSafety?.womenScore || a.safetyScore) : perspective === 'men' ? (a.genderSafety?.menScore || a.safetyScore) : a.safetyScore;
+      const scoreB = perspective === 'women' ? (b.genderSafety?.womenScore || b.safetyScore) : perspective === 'men' ? (b.genderSafety?.menScore || b.safetyScore) : b.safetyScore;
+      return scoreB - scoreA;
+    }).slice(0, 3);
+  }, [locations, perspective]);
 
   return (
     <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -127,6 +142,157 @@ export default function HomePage({
 
       {/* Gender Safety Perspective Switcher */}
       <GenderFilterToggle perspective={perspective} setPerspective={setPerspective} />
+
+      {/* Top Recommended Places Spotlight Section */}
+      {topRecommendedPlaces.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
+              <span>⭐ Top Recommended Places</span>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, background: 'var(--pastel-pink)', color: '#B52B4E', padding: '2px 10px', borderRadius: 'var(--radius-full)' }}>
+                Highest Safety Index
+              </span>
+            </h2>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+              Curated for {perspective === 'women' ? "Women's Safety 🌸" : perspective === 'men' ? "Men's Safety 🛡️" : "Everyone ✨"}
+            </span>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '16px'
+          }}>
+            {topRecommendedPlaces.map((loc, idx) => {
+              const currentScore = perspective === 'women' 
+                ? (loc.genderSafety?.womenScore || loc.safetyScore)
+                : perspective === 'men' 
+                  ? (loc.genderSafety?.menScore || loc.safetyScore)
+                  : loc.safetyScore;
+
+              return (
+                <div
+                  key={`top-${loc.id}`}
+                  onClick={() => onSelectLocation(loc)}
+                  style={{
+                    background: 'white',
+                    borderRadius: 'var(--radius-lg)',
+                    border: '1.5px solid var(--card-border)',
+                    boxShadow: 'var(--card-shadow)',
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = 'var(--card-shadow-hover)';
+                    e.currentTarget.style.borderColor = '#FF9EAA';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'var(--card-shadow)';
+                    e.currentTarget.style.borderColor = 'var(--card-border)';
+                  }}
+                >
+                  {/* Top Badge */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '12px',
+                    left: '12px',
+                    zIndex: 2,
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(6px)',
+                    padding: '4px 10px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.74rem',
+                    fontWeight: 800,
+                    color: '#B52B4E',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                  }}>
+                    <span>#{idx + 1} Top Recommended</span>
+                  </div>
+
+                  {/* Score Pill */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '12px',
+                    right: '12px',
+                    zIndex: 2,
+                    background: 'linear-gradient(135deg, #62C498 0%, #38A169 100%)',
+                    color: 'white',
+                    padding: '4px 10px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.8rem',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    boxShadow: '0 2px 8px rgba(56,161,105,0.3)'
+                  }}>
+                    <span>⭐ {currentScore}</span>
+                  </div>
+
+                  <div style={{ height: '140px', overflow: 'hidden', position: 'relative' }}>
+                    <img
+                      src={loc.image}
+                      alt={loc.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </div>
+
+                  <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.76rem', color: 'var(--text-secondary)' }}>
+                      <MapPin size={13} color="#FF6B8B" />
+                      <span>{loc.neighborhood}</span>
+                      <span>•</span>
+                      <span>{loc.category}</span>
+                    </div>
+
+                    <h3 style={{ fontSize: '1.02rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)', lineHeight: 1.3 }}>
+                      {loc.name}
+                    </h3>
+
+                    <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {perspective === 'women' ? loc.genderSafety?.womenSummary : perspective === 'men' ? loc.genderSafety?.menSummary : loc.safeTimeWindows?.safest}
+                    </p>
+
+                    <div style={{ marginTop: 'auto', paddingTop: '8px', display: 'flex', gap: '8px' }}>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectLocation(loc);
+                        }}
+                        className="btn-secondary"
+                        style={{ flex: 1, padding: '6px 10px', fontSize: '0.78rem', justifyContent: 'center' }}
+                      >
+                        View Details
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onOpenPlanHangout(loc);
+                        }}
+                        className="btn-primary"
+                        style={{ padding: '6px 12px', fontSize: '0.78rem' }}
+                      >
+                        Plan Hangout 🌸
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Search & Filter Controls Bar */}
       <div style={{
